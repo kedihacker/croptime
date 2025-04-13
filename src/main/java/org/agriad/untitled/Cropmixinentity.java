@@ -37,21 +37,22 @@ public class Cropmixinentity extends BlockEntity {
 
     public void tick(World world, BlockPos pos, BlockState state, Cropmixinentity blockEntity) {
         int age = world.getBlockState(pos).get(CropBlock.AGE);
-        long perstagetickamount = 200L;
+        long perstagetickamount = 10L;
         if (age < 7) {
 
             if (first_tick == Long.MIN_VALUE) {
                 first_tick = CropBlock.MAX_AGE - age * perstagetickamount;
+                world.getBlockEntity(pos).markDirty();
+            }
+            if (first_tick == 0) {
+                first_tick = world.getTime();
+                world.getBlockEntity(pos).markDirty();
             }
             long elapsed_time = world.getTime() - first_tick;
             long current_stage = elapsed_time / perstagetickamount;
             if (current_stage > age) {
-                world.setBlockState(pos, state.with(CropBlock.AGE, (int) current_stage));
-
+                world.setBlockState(pos, state.with(CropBlock.AGE, (int) current_stage), CropBlock.NOTIFY_LISTENERS);
             }
-
-        } else {
-
 
         }
 
