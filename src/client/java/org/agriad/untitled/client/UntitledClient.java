@@ -6,5 +6,7 @@ public class UntitledClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+
+
     }
 }

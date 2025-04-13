@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "untitled",
+  "id": "croptime",
   "version": "${version}",
-  "name": "untitled",
+  "name": "CropTime",
   "description": "",
   "authors": [],
   "contact": {},
@@ -14,7 +14,7 @@
       "org.agriad.untitled.client.UntitledClient"
     ],
     "main": [
-      "org.agriad.untitled.Untitled"
+      "org.agriad.untitled.UntitledServer"
     ]
   },
   "mixins": [
@@ -31,7 +31,9 @@
   },
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_2302": ["net/minecraft/class_2343"]
+      "net/minecraft/class_2302": [
+        "net/minecraft/class_2343"
+      ]
     }
   }
 }

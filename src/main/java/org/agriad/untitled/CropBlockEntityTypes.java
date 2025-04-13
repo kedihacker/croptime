@@ -1,6 +1,7 @@
 package org.agriad.untitled;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -18,7 +19,7 @@ public class CropBlockEntityTypes {
 
 
     public static final BlockEntityType<Cropmixinentity> DEMO_BLOCK = register(
-            "crop_block", FabricBlockEntityTypeBuilder.create(Cropmixinentity::new, Blocks.WHEAT).build()
+            "crop_block", FabricBlockEntityTypeBuilder.create(Cropmixinentity::new, Blocks.WHEAT, Blocks.BEETROOTS,Blocks.CARROTS,Blocks.POTATOES).build()
     );
 
 
