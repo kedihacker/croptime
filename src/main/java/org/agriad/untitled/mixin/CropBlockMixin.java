@@ -44,7 +44,7 @@ public abstract class CropBlockMixin implements BlockEntityProvider {
 
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     public void on$RandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-        ci.cancel(); // Orijinal metodu iptal eder
+        ci.cancel(); // cancel original method
     }
 }
 

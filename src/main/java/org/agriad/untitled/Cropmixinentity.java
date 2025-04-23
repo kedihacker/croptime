@@ -1,6 +1,7 @@
 package org.agriad.untitled;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -40,7 +41,7 @@ public class Cropmixinentity extends BlockEntity {
         long perstagetickamount = 10L;
         if (age < 7) {
 
-            if (first_tick == Long.MIN_VALUE) {
+            if (first_tick == Long.MIN_VALUE) { // mod is new and exsisting crops are not yet recorded
                 first_tick = CropBlock.MAX_AGE - age * perstagetickamount;
                 world.getBlockEntity(pos).markDirty();
             }

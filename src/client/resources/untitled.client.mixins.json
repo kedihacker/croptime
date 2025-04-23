@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.agriad.untitled.mixin.client",
+  "package": "org.agriad.untitled.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
   ],
