@@ -1,15 +1,15 @@
 package org.agriad.untitled;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -36,13 +36,45 @@ public class Cropmixinentity extends BlockEntity {
         return null;
     }
 
-    public void tick(World world, BlockPos pos, BlockState state, Cropmixinentity blockEntity) {
-        int age = world.getBlockState(pos).get(CropBlock.AGE);
-        long perstagetickamount = 10L;
-        if (age < 7) {
 
-            if (first_tick == Long.MIN_VALUE) { // mod is new and exsisting crops are not yet recorded
-                first_tick = CropBlock.MAX_AGE - age * perstagetickamount;
+    public void tick(World world, BlockPos pos, BlockState state, Cropmixinentity blockEntity) {
+        Block blocktype = world.getBlockState(pos).getBlock();
+        int age;
+        IntProperty agetype;
+        int maxage;
+        switch (blocktype) {
+            case BeetrootsBlock ignored:
+                age = state.get(BeetrootsBlock.AGE);
+                agetype = BeetrootsBlock.AGE;
+                maxage = BeetrootsBlock.BEETROOTS_MAX_AGE;
+                break;
+            case CarrotsBlock ignored:
+                age = state.get(CarrotsBlock.AGE);
+                agetype = CarrotsBlock.AGE;
+                maxage = CarrotsBlock.MAX_AGE;
+                break;
+            case PotatoesBlock ignored:
+                age = state.get(PotatoesBlock.AGE);
+                agetype = PotatoesBlock.AGE;
+                maxage = PotatoesBlock.MAX_AGE;
+                break;
+            case CropBlock ignored:
+                age = state.get(CropBlock.AGE);
+                agetype = CropBlock.AGE;
+                maxage = CropBlock.MAX_AGE;
+
+                break;
+
+            default:
+                throw new IllegalStateException("Unexpected value: sigma boi " + blocktype);
+        }
+
+
+        long perstagetickamount = 10L;
+        if (age < maxage) {
+            UntitledServer.CONFIG.growthmodel();
+            if (first_tick == Long.MIN_VALUE) { // mod is new and existing crops are not yet recorded
+                first_tick = maxage - age * perstagetickamount; // preserve progress of the crop
                 world.getBlockEntity(pos).markDirty();
             }
             if (first_tick == 0) {
@@ -52,7 +84,7 @@ public class Cropmixinentity extends BlockEntity {
             long elapsed_time = world.getTime() - first_tick;
             long current_stage = elapsed_time / perstagetickamount;
             if (current_stage > age) {
-                world.setBlockState(pos, state.with(CropBlock.AGE, (int) current_stage), CropBlock.NOTIFY_LISTENERS);
+                world.setBlockState(pos, state.with(agetype, (int) current_stage), CropBlock.NOTIFY_LISTENERS);
             }
 
         }
@@ -62,6 +94,7 @@ public class Cropmixinentity extends BlockEntity {
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         nbt.putLong("first_tick", first_tick);
+
 
         super.writeNbt(nbt, registryLookup);
     }

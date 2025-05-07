@@ -14,10 +14,7 @@
       "org.agriad.untitled.client.UntitledClient"
     ],
     "main": [
-      "org.agriad.untitled.Init"
-    ],
-    "modmenu": [
-      "org.agriad.untitled.client.ModMenuIntegration"
+      "org.agriad.untitled.UntitledServer"
     ]
   },
   "mixins": [

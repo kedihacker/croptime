@@ -1,0 +1,10 @@
+{
+  "text.config.croptimeconfig.option.growthmodel": "Growth Model",
+  "text.config.croptimeconfig.option.growthmodel.description": "The way growth is calculated.",
+  "text.config.croptimeconfig.option.growthmodel.value.fixedtime": "Fixed Time",
+  "text.config.croptimeconfig.option.growthmodel.value.fixedtime.tooltip": "The time between stages is fixed.",
+  "text.config.croptimeconfig.option.growthmodel.value.simulated": "Simulated",
+  "text.config.croptimeconfig.option.growthmodel.value.simulated.tooltip": "The time between stages is simulated as if random ticks are always happening.",
+  "text.config.croptimeconfig.option.anIntOption": "TEsting",
+  "text.config.croptimeconfig.option.anIntOption.tooltip": "testing tooltip"
+}
