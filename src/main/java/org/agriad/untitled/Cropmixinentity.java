@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 
 import java.util.Optional;
 
-record advancedmathrecord(double virtualfirsttick, double[] tickprogession) {
+record advancedmathrecord(long virtualfirsttick, long[] tickprogession) {
 }
 
 public class Cropmixinentity extends BlockEntity {
 
     private long first_tick = 0;
-    private int[] prog = {};
+    private long[] prog = {};
 
     public Cropmixinentity(BlockPos pos, BlockState state) {
         super(CropBlockEntityTypes.DEMO_BLOCK, pos, state);
@@ -39,35 +39,34 @@ public class Cropmixinentity extends BlockEntity {
     }
 
     // return a int and a array of ints
-    private static advancedmathrecord advancedmath(float[] randompercent, float chanchepernottick, int totallevels, int currentlevel, double currenttick) {
+    private static advancedmathrecord advancedmath(float[] randompercent, float chanchepernottick, int totallevels, int currentlevel, long currenttick) {
         if (randompercent.length != totallevels) {
             throw new IllegalArgumentException("randompercent array length must be equal to totallevels");
         }
         if (currentlevel > totallevels) {
             throw new IllegalArgumentException("currentlevel must be less than or equal to totallevels");
         }
-        double[] interlist = listmath(randompercent, chanchepernottick, totallevels);
-        int before = 0;
+        long[] interlist = listmath(randompercent, chanchepernottick, totallevels);
+        long before = 0;
         for (int i = currentlevel - 1; i >= 0; i--) {
             before += interlist[i];
         }
-        double virtualtick = currenttick - before;
-        int acc = 0;
+        long virtualtick = currenttick - before;
+
         for (int i = 0; i < totallevels; i++) {
-            double intermediate = interlist[i];
-            interlist[i] = virtualtick + acc;
-            acc += intermediate;
+            long intermediate = interlist[i];
+            interlist[i] = virtualtick + intermediate ;
+
         }
         return new advancedmathrecord(virtualtick, interlist);
     }
 
     private static int domath(float randompercent, float chanchepernottick, int levels) {
-        float reversed = 1 - randompercent;
-        return (int) Math.floor(Math.log(reversed) / Math.log(chanchepernottick));
+        return (int) Math.floor(Math.log(1 - randompercent) / Math.log(chanchepernottick));
     }
 
-    private static double[] listmath(float[] randompercent, float chanchepernottick, int levels) {
-        double[] v = new double[levels];
+    private static long[] listmath(float[] randompercent, float chanchepernottick, int levels) {
+        long[] v = new long[levels];
         int total = 0;
         for (int i = 0; i < levels; i++) {
             int var = domath(randompercent[i], chanchepernottick, levels);
@@ -80,6 +79,7 @@ public class Cropmixinentity extends BlockEntity {
     public void tick(World world, BlockPos pos, BlockState state, Cropmixinentity blockEntity) {
         Block blocktype = world.getBlockState(pos).getBlock();
         int age;
+
         IntProperty agetype;
         int maxage;
         float chanchepernottick = (float) 1 - ((float) 3 / (4096 * 4));
@@ -111,30 +111,37 @@ public class Cropmixinentity extends BlockEntity {
         }
 
 
-        long perstagetickamount = 10L;
+        int ageacc = 0;
         if (age < maxage) {
-            if (prog == null || prog.length == 0) {
+            if (prog.length == 0) {
                 float[] randomlist = new float[maxage];
                 for (int i = 0; i < maxage; i++) {
-                    randomlist[i] = (float) Math.random();
+                    randomlist[i] = (float) world.random.nextFloat();
                 }
+                System.out.println(pos);
                 advancedmathrecord record = advancedmath(randomlist, chanchepernottick, maxage, world.getBlockState(pos).get(agetype), world.getTime());
-
+                prog = record.tickprogession();
+                first_tick = record.virtualfirsttick();
+                this.markDirty();
             }
-            long elapsed_time = world.getTime() - first_tick;
-            long current_stage = elapsed_time / perstagetickamount;
-            if (current_stage > age) {
-                world.setBlockState(pos, state.with(agetype, (int) current_stage), CropBlock.NOTIFY_LISTENERS);
-            }
+            long worldtime = world.getTime();
+            for (long l : prog) {
+                if (l < worldtime) {
+                    ageacc++;
 
+
+                }
+            }
+            if (age != ageacc) {
+                world.setBlockState(pos, state.with(agetype, ageacc), CropBlock.NOTIFY_LISTENERS);
+            }
         }
-
     }
 
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         nbt.putLong("first_tick", first_tick);
-        nbt.putIntArray("prog", prog);
+        nbt.putLongArray("prog", prog);
 
         super.writeNbt(nbt, registryLookup);
     }
@@ -143,9 +150,9 @@ public class Cropmixinentity extends BlockEntity {
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
         Optional<Long> first_tick_option = nbt.getLong("first_tick");
-        Optional<int[]> prog_option = nbt.getIntArray("prog");
+        Optional<long[]> prog_option = nbt.getLongArray("prog");
         first_tick = first_tick_option.orElse(Long.MIN_VALUE);
-        prog = prog_option.orElse(new int[]{});
+        prog = prog_option.orElse(new long[]{});
     }
 
 
