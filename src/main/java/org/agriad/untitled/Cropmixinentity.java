@@ -9,6 +9,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.Optional;
@@ -25,7 +26,9 @@ public class Cropmixinentity extends BlockEntity {
         super(CropBlockEntityTypes.DEMO_BLOCK, pos, state);
         System.out.println(CropBlockEntityTypes.DEMO_BLOCK.toString());
     }
-
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state){
+        this.calc(world, pos, state, state.getBlock(), true);
+    }
     public static <T extends BlockEntity> BlockEntityTicker<T> validtick(World world, BlockState state, BlockEntityType<T> type) {
         if (world instanceof ServerWorld) {
             return (worldx, pos, statex, blockEntity) -> {
@@ -56,24 +59,23 @@ public class Cropmixinentity extends BlockEntity {
         for (int i = 0; i < totallevels; i++) {
             long intermediate = interlist[i];
             interlist[i] = virtualtick + intermediate ;
-
         }
         return new advancedmathrecord(virtualtick, interlist);
-    }
-
-    private static int domath(float randompercent, float chanchepernottick, int levels) {
-        return (int) Math.floor(Math.log(1 - randompercent) / Math.log(chanchepernottick));
     }
 
     private static long[] listmath(float[] randompercent, float chanchepernottick, int levels) {
         long[] v = new long[levels];
         int total = 0;
         for (int i = 0; i < levels; i++) {
-            int var = domath(randompercent[i], chanchepernottick, levels);
+            int var = ingertare(randompercent[i], chanchepernottick, levels);
             v[i] = var + total;
             total += var;
         }
         return v;
+    }
+
+    private static int ingertare(float randompercent, float chanchepernottick, int levels) {
+        return (int) Math.floor(Math.log(1 - randompercent) / Math.log(chanchepernottick));
     }
 
     public void tick(World world, BlockPos pos, BlockState state, Cropmixinentity blockEntity) {
@@ -82,28 +84,48 @@ public class Cropmixinentity extends BlockEntity {
 
         IntProperty agetype;
         int maxage;
+        calc(world, pos, state, blocktype,false);
+    }
+
+    private void calc(World world, BlockPos pos, BlockState state, Block blocktype,boolean dogrow) {
+        int maxage;
+        IntProperty agetype;
+        int age;
         float chanchepernottick = (float) 1 - ((float) 3 / (4096 * 4));
         switch (blocktype) {
             case BeetrootsBlock ignored:
                 age = state.get(BeetrootsBlock.AGE);
+
                 agetype = BeetrootsBlock.AGE;
                 maxage = BeetrootsBlock.BEETROOTS_MAX_AGE;
+                if (dogrow){
+                    age = Math.min(age + 1 , maxage);
+                }
                 chanchepernottick = (float) 4095 / 4096;
                 break;
             case CarrotsBlock ignored:
                 age = state.get(CarrotsBlock.AGE);
                 agetype = CarrotsBlock.AGE;
                 maxage = CarrotsBlock.MAX_AGE;
+                if (dogrow){
+                    age = Math.min(age + world.getRandom().nextInt(5) , maxage);
+                }
                 break;
             case PotatoesBlock ignored:
                 age = state.get(PotatoesBlock.AGE);
                 agetype = PotatoesBlock.AGE;
                 maxage = PotatoesBlock.MAX_AGE;
+                if (dogrow){
+                    age = Math.min(age + world.getRandom().nextInt(5) , maxage);
+                }
                 break;
             case CropBlock ignored:
                 age = state.get(CropBlock.AGE);
                 agetype = CropBlock.AGE;
                 maxage = CropBlock.MAX_AGE;
+                if (dogrow){
+                    age = Math.min(age + world.getRandom().nextInt(5) , maxage);
+                }
                 break;
 
             default:
@@ -116,7 +138,7 @@ public class Cropmixinentity extends BlockEntity {
             if (prog.length == 0) {
                 float[] randomlist = new float[maxage];
                 for (int i = 0; i < maxage; i++) {
-                    randomlist[i] = (float) world.random.nextFloat();
+                    randomlist[i] = world.random.nextFloat();
                 }
                 System.out.println(pos);
                 advancedmathrecord record = advancedmath(randomlist, chanchepernottick, maxage, world.getBlockState(pos).get(agetype), world.getTime());

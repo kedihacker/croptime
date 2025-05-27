@@ -1,6 +1,8 @@
 package org.agriad.untitled.mixin;
 
-import net.minecraft.block.*;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -8,6 +10,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.agriad.untitled.CropBlockEntityTypes;
 import org.agriad.untitled.Cropmixinentity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +28,7 @@ public abstract class CropBlockMixin implements BlockEntityProvider {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new Cropmixinentity(pos,state);
+        return new Cropmixinentity(pos, state);
     }
 
     @Nullable
@@ -46,5 +49,15 @@ public abstract class CropBlockMixin implements BlockEntityProvider {
     public void on$RandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
         ci.cancel(); // cancel original method
     }
+
+    @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
+    public void grow(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+        world.getBlockEntity(
+                pos, CropBlockEntityTypes.DEMO_BLOCK).ifPresent(blockEntity -> {
+            blockEntity.grow(world, random, pos,state);
+        });
+        ci.cancel();
+    }
+
 }
 
