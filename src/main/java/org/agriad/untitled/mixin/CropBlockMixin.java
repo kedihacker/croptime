@@ -50,8 +50,8 @@ public abstract class CropBlockMixin implements BlockEntityProvider {
         ci.cancel(); // cancel original method
     }
 
-    @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
-    public void grow(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+    @Inject(method = "grow", at = @At("HEAD"), cancellable = true)
+    public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state, CallbackInfo ci) {
         world.getBlockEntity(
                 pos, CropBlockEntityTypes.DEMO_BLOCK).ifPresent(blockEntity -> {
             blockEntity.grow(world, random, pos,state);
