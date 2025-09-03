@@ -1,4 +1,4 @@
-package org.agriad.untitled.mixin;
+package agriad.mixin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

@@ -1,4 +1,4 @@
-package org.agriad.untitled.client;
+package agriad.client;
 
 import net.fabricmc.api.ClientModInitializer;
 

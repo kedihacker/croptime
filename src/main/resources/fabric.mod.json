@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "croptime",
+  "version": "${version}",
+  "name": "CropTime",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/untitled/icon.png",
+  "environment": "*",
+  "entrypoints": {
+
+    "main": [
+      "agriad.UntitledServer"
+    ]
+  },
+  "mixins": [
+    "untitled.mixins.json",
+    {
+      "config": "untitled.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_2302": [
+        "net/minecraft/class_2343"
+      ]
+    }
+  }
+}

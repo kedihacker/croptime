@@ -1,5 +1,7 @@
-package org.agriad.untitled;
+package agriad;
 
+import agriad.CropBlockEntityTypes;
+import net.fabricmc.fabric.mixin.serialization.WriteViewMixin;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -8,9 +10,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.IntProperty;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Optional;
 
@@ -175,19 +180,17 @@ public class Cropmixinentity extends BlockEntity {
     }
 
     @Override
-    protected void writeData(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        nbt.putLong("first_tick", first_tick);
-        nbt.putLongArray("prog", prog);
-
-        super.writeData(nbt, registryLookup);
+    protected void writeData(WriteView view) {
+        super.writeData(view);
+        view.putLong("first_tick", first_tick);
+        view.putLongArray("prog", prog);
     }
 
     @Override
-    public void readData(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readData(nbt, registryLookup);
-        Optional<Long> first_tick_option = nbt.getLong("first_tick");
-        Optional<long[]> prog_option = nbt.getLongArray("prog");
-        first_tick = first_tick_option.orElse(Long.MIN_VALUE);
+    public void readData(ReadView view) {
+        super.readData(view);
+        Long first_tick= view.getLong("first_tick",Long.MIN_VALUE);
+        Optional<long[]> prog_option = view.getOptionalLongArray("prog");
         prog = prog_option.orElse(new long[]{});
     }
 

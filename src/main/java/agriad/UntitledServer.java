@@ -1,6 +1,7 @@
-package org.agriad.untitled;
+package agriad;
 
 
+import agriad.CropBlockEntityTypes;
 import net.fabricmc.api.ModInitializer;
 
 public class UntitledServer implements ModInitializer {
