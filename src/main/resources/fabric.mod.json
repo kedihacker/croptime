@@ -1,37 +1,38 @@
 {
-  "schemaVersion": 1,
-  "id": "untitled",
-  "version": "${version}",
-  "name": "Untitled",
-  "description": "",
-  "authors": [],
-  "contact": {},
-  "license": "All-Rights-Reserved",
-  "icon": "assets/untitled/icon.png",
-  "environment": "*",
-  "entrypoints": {
-
-    "main": [
-      "agriad.UntitledServer"
-    ]
-  },
-  "mixins": [
-    "untitled.mixins.json",
-    {
-      "config": "untitled.client.mixins.json",
-      "environment": "client"
-    }
-  ],
-  "depends": {
-    "fabricloader": ">=${loader_version}",
-    "fabric": "*",
-    "minecraft": "${minecraft_version}"
-  },
-  "custom": {
-    "loom:injected_interfaces": {
-      "net/minecraft/class_2302": [
-        "net/minecraft/class_2343"
-      ]
-    }
-  }
+	"schemaVersion": 1,
+	"id": "croptime",
+	"version": "${version}",
+	"name": "CropTime",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/croptime/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.croptime.CropTime"
+		],
+		"client": [
+			"com.croptime.client.CropTimeClient"
+		]
+	},
+	"mixins": [
+		"croptime.mixins.json",
+		{
+			"config": "croptime.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
 }

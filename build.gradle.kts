@@ -1,10 +1,10 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
-	id 'maven-publish'
+	id("net.fabricmc.fabric-loom-remap")
+	`maven-publish`
 }
 
-version = project.mod_version
-group = project.maven_group
+version = providers.gradleProperty("mod_version").get()
+group = providers.gradleProperty("maven_group").get()
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -18,36 +18,35 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"untitled" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
+		register("croptime") {
+			sourceSet(sourceSets.main.get())
+			sourceSet(sourceSets.getByName("client"))
 		}
 	}
-
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
+	mappings(loom.officialMojangMappings())
+	modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	
 }
 
-processResources {
-	def version = project.version
-	inputs.property "version", version
+tasks.processResources {
+	val version = version
+	inputs.property("version", version)
 
 	filesMatching("fabric.mod.json") {
-		expand "version": version
+		expand("version" to version)
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+tasks.withType<JavaCompile>().configureEach {
+	options.release = 17
 }
 
 java {
@@ -60,20 +59,20 @@ java {
 	targetCompatibility = JavaVersion.VERSION_17
 }
 
-jar {
-	def projectName = project.name
-	inputs.property "projectName", projectName
+tasks.jar {
+	val projectName = project.name
+	inputs.property("projectName", projectName)
 
 	from("LICENSE") {
-		rename { "${it}_$projectName"}
+		rename { "${it}_$projectName" }
 	}
 }
 
 // configure the maven publication
 publishing {
 	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
+		register<MavenPublication>("mavenJava") {
+			from(components["java"])
 		}
 	}
 

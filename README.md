@@ -1,2 +1,9 @@
-Crops only grow when loaded as entitiy ticking chunks. https://minecraft.wiki/w/Chunk#Level_and_load_type for more information.
-This mod simulates random tick with math but it doesnt take into crop placment (nearby crops) and soil hydration(dark and light soil).
+# CropTime
+
+## Setup
+
+For setup instructions, please see the [Fabric Documentation page](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up) related to the IDE that you are using.
+
+## License
+
+This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
