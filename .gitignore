@@ -1,25 +1,40 @@
-# IntelliJ / IDE
-.idea/
+# gradle
+
+.gradle/
+build/
 out/
+classes/
+
+# eclipse
+
+*.launch
+
+# idea
+
+.idea/
 *.iml
 *.ipr
 *.iws
-*.launch
 
-# Eclipse
+# vscode
+
 .settings/
-.metadata/
+.vscode/
+bin/
 .classpath
 .project
-bin/
 
-# Gradle
-.gradle/
-build/
+# macos
 
-# Runtime data
+*.DS_Store
+
+# fabric
+
 run/
 
-# OS files
-.DS_Store
-Thumbs.db
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
