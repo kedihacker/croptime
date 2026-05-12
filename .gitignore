@@ -1,26 +1,25 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
-
-# idea
-out
+# IntelliJ / IDE
+.idea/
+out/
+*.iml
 *.ipr
 *.iws
-*.iml
-.idea/*
+*.launch
 
-!.idea/scopes
+# Eclipse
+.settings/
+.metadata/
+.classpath
+.project
+bin/
 
-# gradle
-build
-.gradle
+# Gradle
+.gradle/
+build/
 
-# other
-eclipse
-run
-.idea
-/
+# Runtime data
+run/
+
+# OS files
+.DS_Store
+Thumbs.db
