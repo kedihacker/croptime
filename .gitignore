@@ -1,25 +1,25 @@
-# IntelliJ / IDE
-.idea/
-out/
-*.iml
-*.ipr
-*.iws
+# eclipse
+bin
 *.launch
-
-# Eclipse
-.settings/
-.metadata/
+.settings
+.metadata
 .classpath
 .project
-bin/
 
-# Gradle
-.gradle/
-build/
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
 
-# Runtime data
-run/
+# gradle
+build
+.gradle
 
-# OS files
-.DS_Store
-Thumbs.db
+# other
+eclipse
+run
+
+# Files from Forge MDK
+forge*changelog.txt
