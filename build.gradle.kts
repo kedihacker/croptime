@@ -12,6 +12,11 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		name = "Ladysnake Mods"
+		url = uri("https://maven.ladysnake.org/releases")
+	}
+
 }
 
 loom {
@@ -33,7 +38,16 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
-	
+	// Cardinal api
+	val ccaVersion = property("cca_version") as String
+	// Replace modImplementation with modApi if you expose components in your own API
+	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$ccaVersion")
+	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:$ccaVersion")
+	// Copy the following only if you want to bundle Cardinal Components API as a Jar-in-Jar dependency
+	// (otherwise, you should configure the dependency on Modrinth/Curseforge)
+	include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$ccaVersion")
+	include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:$ccaVersion")
+
 }
 
 tasks.processResources {
