@@ -30,17 +30,8 @@ public class ExampleMod {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    @SuppressWarnings("unused")
-    public void addBlockLocation(long chunkKey, long key, BlockPos blockPos) {
-        addBlockLocation(chunkKey, key, blockPos, 0);
-    }
-
-    @SuppressWarnings("unused")
-    public void addBlockLocation(long chunkKey, long key, BlockPos blockPos, int cropAge) {
-        blockLocationsByChunk.computeIfAbsent(chunkKey, ignored -> new TreeMap<>())
-                .put(key, EncodedLocations.single(blockPos.asLong(), cropAge));
-    }
-
+    @SubscribeEvent
+    public void onblockpalce(BlockEvent.)
     @SubscribeEvent
     public void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
         LOGGER.info("Crop Grow Event");
@@ -129,38 +120,114 @@ public class ExampleMod {
         return lastAgesByLocation;
     }
 
+    /**
+     * Add a single position+age to the stored map for a given chunk and tick key.
+     * If the chunk or tick entry doesn't exist it will be created.
+     */
+    @SuppressWarnings("unused")
+    public void addBlockLocation(long chunkKey, long tickKey, long pos, int age) {
+        TreeMap<Long, EncodedLocations> blockLocations = blockLocationsByChunk.computeIfAbsent(chunkKey, k -> new TreeMap<>());
+        EncodedLocations existing = blockLocations.get(tickKey);
+        if (existing == null) {
+            blockLocations.put(tickKey, EncodedLocations.single(pos, age));
+            return;
+        }
+
+        // append to existing arrays
+        long[] newPositions = Arrays.copyOf(existing.positions, existing.positions.length + 1);
+        newPositions[newPositions.length - 1] = pos;
+        byte[] newAges = Arrays.copyOf(existing.ages, existing.ages.length + 1);
+        newAges[newAges.length - 1] = EncodedLocations.toUnsignedByte(age);
+        blockLocations.put(tickKey, new EncodedLocations(newPositions, newAges));
+    }
+
+    /**
+     * Remove a single position from the stored map for a given chunk and tick key.
+     * Returns true if something was removed, false if the position wasn't found.
+     */
+    @SuppressWarnings("unused")
+    public boolean removeBlockLocation(long chunkKey, long tickKey, long pos) {
+        TreeMap<Long, EncodedLocations> blockLocations = blockLocationsByChunk.get(chunkKey);
+        if (blockLocations == null || blockLocations.isEmpty()) {
+            return false;
+        }
+        EncodedLocations existing = blockLocations.get(tickKey);
+        if (existing == null || existing.positions.length == 0) {
+            return false;
+        }
+
+        int idx = -1;
+        for (int i = 0; i < existing.positions.length; i++) {
+            if (existing.positions[i] == pos) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx == -1) {
+            return false;
+        }
+
+        int newLen = existing.positions.length - 1;
+        if (newLen == 0) {
+            // remove the tick entry entirely
+            blockLocations.remove(tickKey);
+        } else {
+            long[] newPositions = new long[newLen];
+            byte[] newAges = new byte[newLen];
+            for (int i = 0, j = 0; i < existing.positions.length; i++) {
+                if (i == idx) continue;
+                newPositions[j] = existing.positions[i];
+                newAges[j] = existing.ages[i];
+                j++;
+            }
+            blockLocations.put(tickKey, new EncodedLocations(newPositions, newAges));
+        }
+
+        // if chunk map became empty remove the chunk key as well
+        if (blockLocations.isEmpty()) {
+            blockLocationsByChunk.remove(chunkKey);
+        }
+        return true;
+    }
+
+    /** Remove all stored locations for a chunk. */
+    @SuppressWarnings("unused")
+    public void removeChunk(long chunkKey) {
+        blockLocationsByChunk.remove(chunkKey);
+    }
+
     private record EncodedLocations(long[] positions, byte[] ages) {
 
         private static EncodedLocations single(long pos, int cropAge) {
-                return new EncodedLocations(new long[]{pos}, new byte[]{toUnsignedByte(cropAge)});
-            }
-
-            private static EncodedLocations of(long[] positions, byte[] ages) {
-                if (positions == null) {
-                    return new EncodedLocations(new long[0], new byte[0]);
-                }
-                if (ages == null || ages.length != positions.length) {
-                    return new EncodedLocations(positions, new byte[positions.length]);
-                }
-                return new EncodedLocations(positions, ages);
-            }
-
-            private static byte toUnsignedByte(int value) {
-                return (byte) (value & 0xFF);
-            }
-
-            @SuppressWarnings("unused")
-            private static int unsignedByteToInt(byte value) {
-                return value & 0xFF;
-            }
-
-            @SuppressWarnings("unused")
-            private List<BlockPos> asBlockPosList() {
-                List<BlockPos> list = new ArrayList<>(positions.length);
-                for (long pos : positions) {
-                    list.add(BlockPos.of(pos));
-                }
-                return list;
-            }
+            return new EncodedLocations(new long[]{pos}, new byte[]{toUnsignedByte(cropAge)});
         }
+
+        private static EncodedLocations of(long[] positions, byte[] ages) {
+            if (positions == null) {
+                return new EncodedLocations(new long[0], new byte[0]);
+            }
+            if (ages == null || ages.length != positions.length) {
+                return new EncodedLocations(positions, new byte[positions.length]);
+            }
+            return new EncodedLocations(positions, ages);
+        }
+
+        private static byte toUnsignedByte(int value) {
+            return (byte) (value & 0xFF);
+        }
+
+        @SuppressWarnings("unused")
+        private static int unsignedByteToInt(byte value) {
+            return value & 0xFF;
+        }
+
+        @SuppressWarnings("unused")
+        private List<BlockPos> asBlockPosList() {
+            List<BlockPos> list = new ArrayList<>(positions.length);
+            for (long pos : positions) {
+                list.add(BlockPos.of(pos));
+            }
+            return list;
+        }
+    }
 }
